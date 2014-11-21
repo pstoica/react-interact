@@ -1,0 +1,46 @@
+{
+  "name": "react-interactable",
+  "version": "0.0.1",
+  "description": "InteractJS mixin for React components.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "cd examples && node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pstoica/react-interactable.git"
+  },
+  "keywords": [
+    "react",
+    "drag",
+    "drop",
+    "html5",
+    "draggable",
+    "droppable",
+    "mixin",
+    "javascript",
+    "interactjs",
+    "mobile",
+    "react-component"
+  ],
+  "author": "Patrick Stoica <hipatark@gmail.com> (http://github.com/pstoica)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pstoica/react-interactable/issues"
+  },
+  "homepage": "https://github.com/pstoica/react-interactable",
+  "peerDependencies": {
+    "react": "0.12.x"
+  },
+  "devDependencies": {
+    "jsx-loader": "0.12.1",
+    "path": "0.4.9",
+    "react": "0.12.0",
+    "request": "^2.48.0",
+    "webpack": "1.4.8",
+    "webpack-dev-server": "1.6.5"
+  },
+  "dependencies": {
+    "interact": "git://github.com/taye/interact.js"
+  }
+}
