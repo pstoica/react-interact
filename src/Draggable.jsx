@@ -3,98 +3,75 @@
 var React = require('react');
 var Interactable = require('./Interactable');
 
-var Draggable = {
-  componentDidMount() {
-    this.draggableOptions = {};
+var warning = 'Interactable mixin must be included first.';
 
-    this.updateDraggable();
-  },
+module.exports = {
+  dragMove(e, options) {
+    if (!this.interactable) {
+      console.warn(warning);
+      return;
+    }
 
-  // componentWillReceiveProps() {
-  //   this.draggableOptions = {
-  //     ...this.draggableOptions,
-  //     ...this.props.draggableOptions
-  //   };
+    var interactData = this.getInteractData();
 
-  //   this.interactable.draggable(this.draggableOptions);
-  // },
+    var dx = (options.fixAxis !== 'y' ? e.dx : 0);
+    var dy = (options.fixAxis !== 'x' ? e.dy : 0);
 
-  updateDraggable(options) {
-    var draggableDefaults = {
-      onmove: onmove.bind(this)
+    var data = {
+      x: (interactData.x || 0) + dx,
+      y: (interactData.y || 0) + dy
     };
 
-    this.draggableOptions = {
-      ...draggableDefaults,
-      ...this.props.draggableOptions,
-      ...options
-    };
-
-    this.interactable.draggable(this.draggableOptions);
-  },
-
-  lockStartPosition(e) {
-    console.log(e);
-    var { interactStyle } = this.state;
-
-    var styles = {
-      position: 'absolute',
-      height: e.target.offsetHeight,
-      left: e.target.offsetLeft,
-      top: e.target.offsetTop
-    };
-
-    this.setState({
-      interactStyle: {...interactStyle, ...styles}
+    this.setInteractState({
+      data: data,
+      style: getTranslateStyle(data)
     });
   },
 
   resetDrag() {
-    var { interactData, interactStyle } = this.state;
+    if (!this.interactable) {
+      console.warn(warning);
+      return;
+    }
 
-    var coordinates = { x: 0, y: 0 };
+    var interactData = this.getInteractData();
+    var interactStyle = this.getInteractStyle();
 
-    var positionStyle = {
-      position: 'static',
+    var data = { x: 0, y: 0 };
+
+    var style = {
+      ...getTranslateStyle(data),
+      position: null,
       left: null,
       top: null
     };
 
-    var styles = {...transform(null), ...positionStyle};
+    this.setInteractState({
+      data: data,
+      style: style
+    });
+  },
 
-    this.setState({
-      interactData: {...interactData, ...coordinates},
-      interactStyle: {...interactStyle, ...styles}
+  fixToTarget(target) {
+    var style = {
+      ...getTranslateStyle({ x: 0, y: 0 }),
+      position: 'absolute',
+      left: target.offsetLeft,
+      top: target.offsetTop
+    };
+
+    this.setInteractState({
+      style: style
     });
   }
 };
 
-function onmove(e) {
-  var options = this.draggableOptions;
-  var interactData = this.state.interactData;
-  var interactStyle = this.state.interactStyle;
+function getTranslateStyle(data) {
+  var translate = (data.x === 0 && data.y === 0) ?
+    null :
+    'translate(' + data.x + 'px, ' + data.y + 'px)';
 
-  var target = e.target;
-
-  var x = (interactData.x || 0) +
-    (options.fixAxis !== 'y' ? e.dx : 0);
-
-  var y = (interactData.y || 0) +
-    (options.fixAxis !== 'x' ? e.dy : 0);
-
-  var translate = 'translate(' + x + 'px, ' + y + 'px)';
-  var styles = transform(translate);
-
-  var coordinates = {
-    x: x,
-    y: y
-  };
-
-  // update the posiion attributes
-  this.setState({
-    interactData: {...interactData, ...coordinates},
-    interactStyle: {...interactStyle, ...styles}
-  });
+  return transform(translate);
 }
 
 function transform(translate) {
@@ -105,5 +82,3 @@ function transform(translate) {
     transform: translate
   };
 }
-
-module.exports = Draggable;

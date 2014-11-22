@@ -7,5 +7,4 @@ module.exports = require('./Interactable');
 module.exports = {
   Interactable: require('./Interactable'),
   Draggable: require('./Draggable'),
-  Sortable: require('./Sortable')
 };

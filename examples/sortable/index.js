@@ -1,128 +1,104 @@
 'use strict';
 
-var React = require('react'),
-    {
-      Interactable,
-      Draggable,
-      Sortable
-    } = require('react-interact');
+var React = require('react');
+var { Interactable, Draggable } = require('react-interact');
 
-var SortableItem = React.createClass({
-  mixins: [Sortable],
+var exampleItems = ['blue', 'green', 'red', 'yellow', 'purple', 'black'];
 
-  render() {
-    var { data, children, style, ...props } = this.props;
-
-    style.visibility = this.isDragging() ? 'hidden' : 'visible';
-
-    style = {...style, ...this.state.interactStyle};
-
-    return <li style={style} {...props}>
-      {children}
-    </li>;
-  }
-});
+var SortableItem = require('./SortableItem');
 
 var Sortable = React.createClass({
   getInitialState() {
     return {
-      data: {
-        items: [
-          "blue",
-          "green",
-          "red",
-          "yellow",
-          "purple",
-          "black"
-        ],
-
-        dragging: null,
-        dropzone: null,
-        pageY: null
-      }
+      items: exampleItems,
+      currentDraggable: null
     };
   },
 
-  sortStart(e) {
-    var data = this.state.data;
-
-    data.dragging = e.target.dataset.key + '-proxy';
-    this.setState({data: data});
-  },
-
-  sortDragEnter(e) {
-    var data = this.state.data;
-
-    var dropzoneKey = e.target.dataset.key;
-    console.log('enter ' + dropzoneKey);
-
-    data.dropzone = dropzoneKey;
-    data.pageY = e.pageY;
-
-    this.setState({data: data});
-  },
-
-  sortDragLeave(e) {
-    var data = this.state.data;
-
-    var draggableKey = data.dragging;
-    var dropzoneKey = e.target.dataset.key;
-    console.log('leave ' + dropzoneKey);
-
-    var draggableIndex = data.items.indexOf(draggableKey);
-    var dropzoneIndex = data.items.indexOf(dropzoneKey);
-
-    data.items[draggableIndex] = dropzoneKey;
-    data.items[dropzoneIndex] = draggableKey;
-
-    data.dropzone = null;
-
-    this.setState({data: data});
-    // this.refs[draggableKey].resetDrag();
-  },
-
-  sortEnd(e) {
-    var data = this.state.data;
-    data.dragging = null;
-
-    this.setState({data: data});
-    console.log('end');
-    console.log(e);
-  },
-
   render() {
-    var items = [];
+    var children = [];
 
-    this.state.data.items.forEach((item) => {
+    this.state.items.forEach((item) => {
+      var currentDraggable = this.state.currentDraggable;
+      var placeholderKey = item + '-placeholder';
+
       var style = {
         color: item,
-        marginTop: 10,
-        marginBottom: 10
+        paddingTop: 30,
+        paddingBottom: 30,
+        backgroundColor: '#eee',
+        borderBottom: '1px solid black',
+        borderTop: '1px solid black'
       };
 
-      var props = {
+      var baseProps = { style: style };
+
+      var placeholderProps = {
+        ...baseProps,
+        key: placeholderKey,
+        item: placeholderKey,
+        ref: placeholderKey
+      };
+
+      var draggableProps = {
+        ...baseProps,
         key: item,
         ref: item,
-        data-key: item,
+        item: item,
+        dragStart: this.dragStart,
+        dragEnd: this.dragEnd,
+        sort: this.sort
+      };
 
-        data: this.state.data,
-        sortStart: this.sortStart,
-        sortDragEnter: this.sortDragEnter,
-        sortDragLeave: this.sortDragLeave,
-        sortEnd: this.sortEnd,
-        style: style
+      children.push(<SortableItem {...draggableProps}>{item}</SortableItem>);
+
+      if (currentDraggable === item) {
+        children.push (
+          <SortableItem {...placeholderProps} isPlaceholder={true}>
+            {item}
+          </SortableItem>
+        );
       }
-
-      items.push(
-        <SortableItem {...props}>
-          {item}
-        </SortableItem>
-      );
     });
 
     return (
-      <ul>{items}</ul>
+      <ul>{children}</ul>
     );
+  },
+
+  dragStart(e) {
+    this.setState({ currentDraggable: e.target.dataset.key });
+  },
+
+  dragEnd(e) {
+    this.setState({ currentDraggable: null });
+  },
+
+  sort(e) {
+    var items = this.state.items.slice(0);
+
+    var draggableKey = this.state.currentDraggable;
+    var dropzoneKey = e.target.dataset.key;
+
+    var direction = e.dy;
+
+    var draggableIndex = items.indexOf(draggableKey);
+    var dropzoneIndex = items.indexOf(dropzoneKey);
+
+    // remove item from original position
+    items.splice(draggableIndex, 1);
+
+    if (draggableIndex < dropzoneIndex && direction > 0) {
+      // insert after dropzone
+      items.splice(dropzoneIndex, 0, draggableKey);
+    } else if (draggableIndex > dropzoneIndex && direction < 0) {
+      // insert before dropzone
+      items.splice(dropzoneIndex, 0, draggableKey);
+    } else {
+      items.splice(draggableIndex, 0, draggableKey);
+    }
+
+    this.setState({items: items});
   }
 });
 
