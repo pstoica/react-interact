@@ -1,6 +1,7 @@
 {
-  "name": "react-interactable",
+  "name": "react-interact",
   "version": "0.0.1",
+  "private": true,
   "description": "InteractJS mixin for React components.",
   "main": "src/index.js",
   "scripts": {
@@ -8,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pstoica/react-interactable.git"
+    "url": "https://github.com/pstoica/react-interact.git"
   },
   "keywords": [
     "react",
@@ -26,9 +27,9 @@
   "author": "Patrick Stoica <hipatark@gmail.com> (http://github.com/pstoica)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pstoica/react-interactable/issues"
+    "url": "https://github.com/pstoica/react-interact/issues"
   },
-  "homepage": "https://github.com/pstoica/react-interactable",
+  "homepage": "https://github.com/pstoica/react-interact",
   "peerDependencies": {
     "react": "0.12.x"
   },
